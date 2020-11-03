@@ -1,13 +1,34 @@
 <template>
   <v-app id="app">
-    <router-view/>
+    <v-app-bar dark flat dense :color="colors.primary" app>
+      Residencias ITT
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon dark>
+          mdi-logout
+        </v-icon>
+      </v-btn>
+    </v-app-bar>
+    <v-main>
+      <v-container>
+        <router-view />
+      </v-container>
+    </v-main>
   </v-app>
 </template>
 
+<script>
+export default {
+  data() {
+    return {};
+  },
+  computed: {
+    colors() {
+      return this.$store.state.colors;
+    },
+  },
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 </style>

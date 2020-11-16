@@ -9,10 +9,12 @@
         </v-toolbar-title>
       </v-toolbar>
       <v-card-text class="text-center">
-        <v-form class="mx-auto mt-2" style="max-width: 80%;">
+        <v-form ref="registerForm" class="mx-auto mt-2" style="max-width: 80%;">
           <v-text-field
             append-icon="mdi-email"
             outlined
+            v-model="email"
+            :rules="emailRules"
             dense
             rounded
             label="Correo electónico"
@@ -22,6 +24,8 @@
             append-icon="mdi-lock"
             outlined
             dense
+            v-model="password"
+            :rules="passwordRules"
             rounded
             label="Contraseña"
             type="password"
@@ -29,6 +33,8 @@
           <v-text-field
             append-icon="mdi-account"
             outlined
+            v-model="name"
+            :rules="nameRules"
             dense
             rounded
             label="Nombre"
@@ -36,6 +42,8 @@
           <v-text-field
             append-icon="mdi-account-details"
             outlined
+            v-model="lastName"
+            :rules="lastNameRules"
             dense
             rounded
             label="Apellidos"
@@ -43,6 +51,8 @@
           <v-text-field
             append-icon="mdi-counter"
             outlined
+            v-model="controlNumber"
+            :rules="controlNumberRules"
             dense
             rounded
             label="Número de control"
@@ -57,7 +67,8 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                v-model="date"
+                v-model="birthdate"
+                :rules="birthdateRules"
                 label="Fecha de nacimiento"
                 append-icon="mdi-calendar"
                 readonly
@@ -68,10 +79,12 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
+            <v-date-picker v-model="birthdate" @input="menu2 = false"></v-date-picker>
           </v-menu>
           <v-text-field
             append-icon="mdi-map-marker"
+            v-model="address"
+            :rules="addressRules"
             outlined
             dense
             rounded
@@ -79,22 +92,20 @@
           ></v-text-field>
           <v-text-field
             append-icon="mdi-phone"
+            v-model="phone"
+            :rules="phoneRules"
             outlined
             dense
             rounded
             label="Teléfono"
           ></v-text-field>
-          <v-text-field
-            append-icon="mdi-email"
-            outlined
-            dense
-            rounded
-            label="Mostrar mi número a los demás"
-          ></v-text-field>
           <v-select
             class="mb-0 pb-0"
             append-icon="mdi-account-tie"
             outlined
+            :items="careers"
+            v-model="career"
+            :rules="careerRules"
             dense
             rounded
             label="Seleccione su carrera"
@@ -102,22 +113,46 @@
           <v-row class="text-center px-6 py-0 mt-0 mb-6">
             <v-checkbox
               dense
+              v-model="showMyMail"
               class="mt-0"
               hide-details
               label="Mostrar mi correo a los demás"
             ></v-checkbox>
             <v-checkbox
               dense
+              v-model="showMyPhone"
               hide-details
               class="mt-0"
               label="Mostrar mi teléfono a los demás"
             ></v-checkbox>
           </v-row>
-          <v-btn class="mx-auto" small rounded depressed :color="colors.primary">
+          <v-btn
+            @click="registerUser()"
+            class="mx-auto"
+            small
+            :disabled="loadingRegister"
+            :loading="loadingRegister"
+            rounded
+            depressed
+            :color="colors.primary"
+          >
             <v-icon left small>
               mdi-check
             </v-icon>
             Listo!
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            @click="redirectToLogin()"
+            class="mx-auto mt-4"
+            x-small
+            text
+            :color="colors.primary"
+          >
+            <v-icon left small>
+              mdi-arrow-left
+            </v-icon>
+            Regresa a iniciar sesión
           </v-btn>
         </v-form>
       </v-card-text>
@@ -129,13 +164,86 @@
 export default {
   data() {
     return {
+      email: '',
+      emailRules: [
+        (v) => !!v || 'Ingrese su email para continuar',
+        (v) => /.+@.+\..+/.test(v) || 'Ingrese un email válido',
+      ],
+      password: '',
+      passwordRules: [
+        (v) => !!v || 'Ingrese una clave para continuar',
+        (v) => (v && v.length >= 8) || 'La clave debe ser al menos de 8 caracteres',
+      ],
+      name: '',
+      nameRules: [
+        (v) => !!v || 'Ingrese su nombre para continuar',
+      ],
+      lastName: '',
+      lastNameRules: [
+        (v) => !!v || 'Ingrese sus apellido para continuar',
+      ],
+      controlNumber: '',
+      controlNumberRules: [
+        (v) => !!v || 'Ingrese su # de control para continuar',
+      ],
+      birthdate: '',
+      birthdateRules: [
+        (v) => !!v || 'Ingrese su fecha de nacimiento para continuar',
+      ],
+      address: '',
+      addressRules: [
+        (v) => !!v || 'Ingrese su dirección para continuar',
+      ],
+      phone: '',
+      phoneRules: [
+        (v) => !!v || 'Ingrese su teléfono para continuar',
+        (v) => (v && v.length >= 8) || 'Ingrese al menos 8 digitos para su teléfono',
+      ],
+      showMyPhone: true,
+      showMyMail: true,
+      career: '',
+      careerRules: [
+        (v) => !!v || 'Seleccione su carrera para continuar',
+      ],
       date: new Date().toISOString().substr(0, 10),
       menu2: false,
+      loadingRegister: false,
     };
+  },
+  methods: {
+    redirectToLogin() {
+      this.$router.push({ name: 'Login' });
+    },
+    registerUser() {
+      if (this.$refs.registerForm.validate()) {
+        this.loadingRegister = true;
+        this.$store.dispatch('userModule/register', this)
+          .then(() => {
+            this.$notiflix.Notify.Success('Te has registrado correctamente!');
+            this.loadingRegister = false;
+            this.$router.push({ name: 'Login' });
+          })
+          .catch(() => {
+            this.loadingRegister = false;
+            this.$notiflix.Notify.Failure('Ocurrió un error al enviar tus datos, por favor, reintenta')
+          });
+      }
+    },
+  },
+  mounted() {
+    this.$store.dispatch('careerModule/getAll');
   },
   computed: {
     colors() {
       return this.$store.state.colors;
+    },
+    careers() {
+      const careers = [];
+      this.$store.state.careerModule.careers.forEach((career) => {
+        const tmpCareer = { text: career.name, value: career.id };
+        careers.push(tmpCareer);
+      });
+      return careers;
     },
   },
 };

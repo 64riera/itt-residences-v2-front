@@ -39,6 +39,20 @@
                 Ingresar
             </v-btn>
         </v-form>
+        <div class="text-right">
+          <v-btn
+          class="mt-4"
+          @click="redirectToRegister()"
+          text
+          x-small
+          :color="colors.primary"
+        >
+          <v-icon left x-small>
+            mdi-account-plus
+          </v-icon>
+          No tienes cuenta? Regístrate aquí
+        </v-btn>
+        </div>
       </v-card-text>
     </v-card>
   </div>
@@ -48,6 +62,11 @@
 export default {
   data() {
     return {};
+  },
+  methods: {
+    redirectToRegister() {
+      this.$router.push({ name: 'Register' });
+    },
   },
   computed: {
     colors() {

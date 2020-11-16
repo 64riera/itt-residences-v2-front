@@ -6,21 +6,49 @@ import Home from '../views/Home.vue';
 
 Vue.use(VueRouter);
 
+function isAuthenticated() {
+  const auth = localStorage.getItem('AUTH_TOKEN');
+  if (auth) {
+    return true;
+  }
+
+  return false;
+}
+
+function requiresAuth(to, from, next) {
+  if (isAuthenticated()) {
+    next();
+  } else {
+    next('/login');
+  }
+}
+
+function noRequiresAuth(to, from, next) {
+  if (!isAuthenticated()) {
+    next();
+  } else {
+    next('/home');
+  }
+}
+
 const routes = [
   {
     path: '/home',
     name: 'Home',
     component: Home,
+    beforeEnter: requiresAuth,
   },
   {
     path: '/login',
     name: 'Login',
     component: Login,
+    beforeEnter: noRequiresAuth,
   },
   {
     path: '/register',
     name: 'Register',
     component: Register,
+    beforeEnter: noRequiresAuth,
   },
   {
     path: '/about',

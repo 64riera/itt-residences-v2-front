@@ -1,0 +1,100 @@
+const userModule = {
+  namespaced: true,
+  state: {
+    user: {},
+    isLogged: false,
+  },
+  actions: {
+    verifyAuth({ commit }) {
+      const auth = localStorage.getItem('AUTH_TOKEN');
+      if (auth) {
+        return commit('setIsLogged', true);
+      }
+
+      return commit('setIsLogged', false);
+    },
+    login({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/auth/login`);
+        const body = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify({
+            email: payload.email,
+            password: payload.password,
+          }),
+        };
+
+        let resOk;
+        fetch(url, body)
+          .then((res) => {
+            if (res.ok) {
+              resOk = true;
+            } else {
+              resOk = false;
+            }
+            return res.json();
+          })
+          .then((data) => {
+            if (resOk) {
+              localStorage.setItem('AUTH_TOKEN', `${data.token_type} ${data.access_token}`);
+              commit('setIsLogged', true);
+              resolve(data);
+            } else {
+              reject(data);
+            }
+          });
+      });
+    },
+    logout({ commit }) {
+      commit('unsetUserData');
+    },
+    register({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/auth/signup`);
+        const body = {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: payload.name,
+            last_name: payload.lastName,
+            control_number: payload.controlNumber,
+            birthdate: payload.birthdate,
+            phone: payload.phone,
+            visible_mail: payload.showMyMail,
+            visible_phone: payload.showMyPhone,
+            area_id: payload.career,
+            user_type: payload.typeUser,
+            email: payload.email,
+            password: payload.password,
+            is_active: true,
+          }),
+        };
+        fetch(url, body).then((res) => {
+          if (res.ok) {
+            resolve(res);
+          } else {
+            reject(res);
+          }
+        });
+      });
+    },
+  },
+  mutations: {
+    setIsLogged(state, payload) {
+      state.isLogged = payload;
+    },
+    unsetUserData(state) {
+      state.isLogged = false;
+      localStorage.removeItem('AUTH_TOKEN');
+    },
+  },
+};
+
+module.exports = userModule;

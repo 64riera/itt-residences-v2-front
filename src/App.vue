@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <v-app-bar dark flat dense :color="colors.primary" app>
-      Residencias ITT
+      Portal ITT
       <v-spacer></v-spacer>
       <v-btn @click="logout()" v-if="isLogged" icon>
         <v-icon dark>

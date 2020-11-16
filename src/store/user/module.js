@@ -5,7 +5,6 @@ const userModule = {
   },
   actions: {
     login({ commit }) {
-      console.log('login', commit);
     },
     logout({ commit }) {},
     register({ commit }, payload) {

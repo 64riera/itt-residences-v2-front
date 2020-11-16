@@ -33,6 +33,10 @@ function noRequiresAuth(to, from, next) {
 
 const routes = [
   {
+    path: '/',
+    redirect: 'home',
+  },
+  {
     path: '/home',
     name: 'Home',
     component: Home,

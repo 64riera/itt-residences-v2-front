@@ -125,7 +125,7 @@
             :rules="careerRules"
             dense
             rounded
-            label="Seleccione su carrera"
+            label="Seleccione su área"
           ></v-select>
           <v-row class="text-center px-6 py-0 mt-0 mb-6">
             <v-checkbox

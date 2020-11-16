@@ -261,12 +261,18 @@ export default {
         })
         .then(() => {
           this.loadingAreas = false;
+        })
+        .catch(() => {
+          this.loadingAreas = false;
         });
       this.$store.dispatch('areaModule/getAll')
         .then(() => {
           this.loadingAreas = false;
         })
         .then(() => {
+          this.loadingAreas = false;
+        })
+        .catch(() => {
           this.loadingAreas = false;
         });
     },

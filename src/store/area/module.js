@@ -1,12 +1,12 @@
-const careerModule = {
+const areaModule = {
   namespaced: true,
   state: {
-    careers: [],
+    areas: [],
   },
   actions: {
     getAll({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/careers`);
+        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/areas`);
         const body = {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -26,9 +26,9 @@ const careerModule = {
   },
   mutations: {
     setAll(state, payload) {
-      state.careers = payload;
+      state.areas = payload;
     },
   },
 };
 
-module.exports = careerModule;
+module.exports = areaModule;

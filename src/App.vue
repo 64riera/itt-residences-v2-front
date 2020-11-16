@@ -3,7 +3,7 @@
     <v-app-bar dark flat dense :color="colors.primary" app>
       Residencias ITT
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn @click="logout()" v-if="isLogged" icon>
         <v-icon dark>
           mdi-logout
         </v-icon>
@@ -24,9 +24,22 @@ export default {
   data() {
     return {};
   },
+  methods: {
+    logout() {
+      this.$store.dispatch('userModule/logout');
+      this.$notiflix.Notify.Success('Te esperamos pronto!');
+      this.$router.push({ name: 'Login' });
+    },
+  },
+  mounted() {
+    this.$store.dispatch('userModule/verifyAuth');
+  },
   computed: {
     colors() {
       return this.$store.state.colors;
+    },
+    isLogged() {
+      return this.$store.state.userModule.isLogged;
     },
   },
 };

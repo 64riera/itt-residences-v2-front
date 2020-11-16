@@ -21,14 +21,16 @@
             type="email"
           ></v-text-field>
           <v-text-field
-            append-icon="mdi-lock"
             outlined
+            :type="showPassword ? 'text' : 'password'"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showPassword = !showPassword"
+            counter
             dense
             v-model="password"
             :rules="passwordRules"
             rounded
             label="Contraseña"
-            type="password"
           ></v-text-field>
           <v-text-field
             append-icon="mdi-account"
@@ -101,9 +103,24 @@
           ></v-text-field>
           <v-select
             class="mb-0 pb-0"
+            append-icon="mdi-account"
+            outlined
+            :loading="loadingTypeUsers"
+            :disabled="loadingTypeUsers"
+            :items="typeUsers"
+            v-model="typeUser"
+            :rules="typeUserRules"
+            dense
+            rounded
+            label="Seleccione su tipo de usuario"
+          ></v-select>
+          <v-select
+            class="mb-0 pb-0"
             append-icon="mdi-account-tie"
             outlined
-            :items="careers"
+            :loading="loadingAreas"
+            :disabled="loadingAreas"
+            :items="careersAndAreas"
             v-model="career"
             :rules="careerRules"
             dense
@@ -203,10 +220,17 @@ export default {
       showMyMail: true,
       career: '',
       careerRules: [
-        (v) => !!v || 'Seleccione su carrera para continuar',
+        (v) => !!v || 'Seleccione su área para continuar',
       ],
+      typeUser: 2,
+      typeUserRules: [
+        (v) => !!v || 'Seleccione su tipo de usuario para continuar',
+      ],
+      showPassword: false,
       date: new Date().toISOString().substr(0, 10),
       menu2: false,
+      loadingAreas: false,
+      loadingTypeUsers: false,
       loadingRegister: false,
     };
   },
@@ -225,25 +249,72 @@ export default {
           })
           .catch(() => {
             this.loadingRegister = false;
-            this.$notiflix.Notify.Failure('Ocurrió un error al enviar tus datos, por favor, reintenta')
+            this.$notiflix.Notify.Failure('Ocurrió un error al enviar tus datos, por favor, reintenta');
           });
       }
     },
+    getCareersAndAreas() {
+      this.loadingAreas = true;
+      this.$store.dispatch('careerModule/getAll')
+        .then(() => {
+          this.loadingAreas = false;
+        })
+        .then(() => {
+          this.loadingAreas = false;
+        });
+      this.$store.dispatch('areaModule/getAll')
+        .then(() => {
+          this.loadingAreas = false;
+        })
+        .then(() => {
+          this.loadingAreas = false;
+        });
+    },
+    getTypeUsers() {
+      this.loadingTypeUsers = true;
+      this.$store.dispatch('typeUserModule/getAll')
+        .then(() => {
+          this.loadingTypeUsers = false;
+        })
+        .catch(() => {
+          this.loadingTypeUsers = false;
+        });
+    },
   },
   mounted() {
-    this.$store.dispatch('careerModule/getAll');
+    this.getTypeUsers();
+    this.getCareersAndAreas();
   },
   computed: {
     colors() {
       return this.$store.state.colors;
     },
-    careers() {
+    typeUsers() {
+      const typeUsers = [];
+      this.$store.state.typeUserModule.typeUsers.forEach((typeUser) => {
+        const tmpTypeUser = { text: typeUser.name, value: typeUser.id };
+        typeUsers.push(tmpTypeUser);
+      });
+      return typeUsers;
+    },
+    careersAndAreas() {
       const careers = [];
       this.$store.state.careerModule.careers.forEach((career) => {
         const tmpCareer = { text: career.name, value: career.id };
         careers.push(tmpCareer);
       });
-      return careers;
+
+      const areas = [];
+      this.$store.state.areaModule.areas.forEach((area) => {
+        const tmpArea = { text: area.name, value: area.id };
+        areas.push(tmpArea);
+      });
+
+      if (this.typeUser === 2) {
+        return careers;
+      }
+
+      return areas;
     },
   },
 };

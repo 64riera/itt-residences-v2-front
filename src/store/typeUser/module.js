@@ -1,12 +1,12 @@
-const careerModule = {
+const typeUserModule = {
   namespaced: true,
   state: {
-    careers: [],
+    typeUsers: [],
   },
   actions: {
     getAll({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/careers`);
+        const url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/type-users`);
         const body = {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -26,9 +26,9 @@ const careerModule = {
   },
   mutations: {
     setAll(state, payload) {
-      state.careers = payload;
+      state.typeUsers = payload;
     },
   },
 };
 
-module.exports = careerModule;
+module.exports = typeUserModule;

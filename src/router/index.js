@@ -2,7 +2,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Register from '@/views/Register.vue';
 import Login from '@/views/Login.vue';
-import Home from '../views/Home.vue';
+import Processes from '@/views/processes/main.vue';
+import Home from '@/views/Home.vue';
 
 Vue.use(VueRouter);
 
@@ -53,6 +54,12 @@ const routes = [
     name: 'Register',
     component: Register,
     beforeEnter: noRequiresAuth,
+  },
+  {
+    path: '/processes',
+    name: 'Processes',
+    component: Processes,
+    beforeEnter: requiresAuth,
   },
   {
     path: '/about',

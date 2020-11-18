@@ -1,6 +1,12 @@
 <template>
   <div class="mt-2">
-    <v-card flat outlined>
+    <v-btn to="/processes" depressed small :color="colors.success">
+      <v-icon left small>
+        mdi-debug-step-over
+      </v-icon>
+      Procesos
+    </v-btn>
+    <v-card class="mt-4" flat outlined>
       <v-card-title>
         <h4 class="font-weight-light">
           Historial de residentes

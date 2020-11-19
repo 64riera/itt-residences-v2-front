@@ -65,10 +65,83 @@ const processModule = {
           });
       });
     },
+    updateOne({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        let url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/process`);
+        let body = {
+          method: 'PATCH',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            Authorization: localStorage.getItem('AUTH_TOKEN'),
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: payload.id,
+            name: payload.name,
+            description: payload.description,
+            isActive: payload.is_active,
+          }),
+        };
+
+        let errorMessage = false;
+        fetch(url, body)
+          .then((res) => {
+            if (!res.ok) {
+              errorMessage = true;
+            }
+
+            return res.json();
+          })
+          .then((data) => {
+            if (errorMessage) {
+              reject(data);
+            } else {
+              resolve(data.data);
+            }
+          });
+      });
+    },
+    deleteOne({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        let url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/process/${payload.id}`);
+        let body = {
+          method: 'DELETE',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            Authorization: localStorage.getItem('AUTH_TOKEN'),
+          },
+        };
+
+        let errorMessage = false;
+        fetch(url, body)
+          .then((res) => {
+            if (!res.ok) {
+              errorMessage = true;
+            }
+
+            return res.json();
+          })
+          .then((data) => {
+            if (errorMessage) {
+              reject(data);
+            } else {
+              resolve(data.data);
+            }
+          });
+      });
+    },
+    undoEditAll({ commit }, payload) {
+      commit('setUndoEditAll');
+    },
   },
   mutations: {
     setAll(state, payload) {
       state.processes = payload;
+    },
+    setUndoEditAll(state, payload) {
+      state.processes.forEach((process) => {
+        process.is_editing = false;
+      });
     },
   },
 };

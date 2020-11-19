@@ -14,7 +14,7 @@
       <v-icon left small> mdi-plus </v-icon>
       Crear proceso
     </v-btn>
-    <v-card class="mt-4" flat outlined>
+    <v-card :disabled="loadingProcesses" class="mt-4" flat outlined>
       <v-card-title>
         <h4 class="font-weight-light">Procesos</h4>
         <v-spacer></v-spacer>
@@ -24,7 +24,99 @@
         :headers="headers"
         :items="processes"
         :search="search"
-      ></v-data-table>
+      >
+
+        <template
+          v-slot:item.name="{ item }"
+        >
+          <span v-if="!item.is_editing">
+            {{ item.name }}
+          </span>
+          <v-text-field
+            v-else
+            v-model="processEditForm.name"
+          >
+          </v-text-field>
+        </template>
+
+        <template
+          v-slot:item.description="{ item }"
+        >
+          <span v-if="!item.is_editing">
+            {{ item.description }}
+          </span>
+          <v-text-field
+            v-else
+            v-model="processEditForm.description"
+          >
+          </v-text-field>
+        </template>
+
+        <template
+          v-slot:item.is_active="{ item }"
+        >
+          <template v-if="!item.is_editing">
+            <v-btn v-if="parseInt(item.is_active)" :color="colors.success" text>
+              <v-icon>
+                mdi-check
+              </v-icon>
+            </v-btn>
+            <v-btn v-else :color="colors.error" text>
+              <v-icon>
+                mdi-close
+              </v-icon>
+            </v-btn>
+          </template>
+          <template v-else>
+            <v-checkbox v-model="processEditForm.is_active"></v-checkbox>
+          </template>
+        </template>
+
+        <template
+          v-slot:item.actions="{ item }"
+        >
+          <template v-if="!item.is_editing">
+            <v-btn @click="editProcess(item)" class="mr-2" depressed small :color="colors.primary">
+              <v-icon small left>
+                mdi-pencil
+              </v-icon>
+              Editar
+            </v-btn>
+            <v-btn @click="confirmDeleteProcess(item)" depressed small :color="colors.error">
+              <v-icon small left>
+                mdi-close
+              </v-icon>
+              Eliminar
+            </v-btn>
+          </template>
+          <template v-else>
+            <v-btn
+              @click="updateProcess(item.id)"
+              class="mr-2"
+              depressed
+              small
+              :color="colors.success"
+            >
+              <v-icon small left>
+                mdi-check
+              </v-icon>
+              Guardar
+            </v-btn>
+            <v-btn
+              @click="cancelEditProcess(item)"
+              depressed
+              small
+              :color="colors.error"
+            >
+              <v-icon small left>
+                mdi-close
+              </v-icon>
+              Cancelar
+            </v-btn>
+          </template>
+        </template>
+
+      </v-data-table>
     </v-card>
     <v-bottom-sheet v-model="sheet" inset>
       <v-sheet class="text-center" height="25rem">
@@ -78,6 +170,38 @@
         </v-btn>
       </v-sheet>
     </v-bottom-sheet>
+    <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="290"
+    >
+      <v-card :loading="deletingProcess" :disabled="deletingProcess">
+        <v-card-title class="headline">
+          Confirmar borrado
+        </v-card-title>
+        <v-card-text>
+          ¿ Deseas eliminar el proceso con el nombre :
+          {{ deleteProcess.name }} ?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            :color="colors.error"
+            text
+            @click="cancelDeleteProcess()"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            :color="colors.success"
+            text
+            @click="onDeleteProcess()"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -85,6 +209,17 @@
 export default {
   data() {
     return {
+      deletingProcess: false,
+      deleteProcess: {
+        id: 0,
+        name: '',
+      },
+      dialog: false,
+      processEditForm: {
+        name: '',
+        description: '',
+        is_active: false,
+      },
       savingProcess: false,
       loadingProcesses: false,
       sheet: false,
@@ -100,10 +235,70 @@ export default {
         },
         { text: 'Descripción', value: 'description' },
         { text: 'Actualmente activo', value: 'is_active' },
+        { text: 'Acciones', value: 'actions' },
       ],
     };
   },
   methods: {
+    confirmDeleteProcess(process) {
+      this.deleteProcess = {
+        id: process.id,
+        name: process.name,
+      };
+      this.dialog = true;
+    },
+    cancelDeleteProcess() {
+      this.deleteProcess = {
+        id: 0,
+        name: '',
+      };
+      this.dialog = false;
+    },
+    onDeleteProcess() {
+      this.deletingProcess = true;
+      this.$store.dispatch('processModule/deleteOne', { id: this.deleteProcess.id })
+        .then(() => {
+          this.getAllProcesses();
+          this.deletingProcess = false;
+          this.dialog = false;
+          this.$notiflix.Notify.Success('EL proceso se ha eliminado correctamente');
+        })
+        .catch(() => {
+          this.deletingProcess = false;
+          this.$notiflix.Notify.Failure('Ocurrió un error al eliminar el proceso');
+        });
+    },
+    updateProcess(processId) {
+      const { name, description, is_active } = this.processEditForm;
+      if (!name.trim() || !description.trim()) {
+        return this.$notiflix.Notify.Warning('Ingresa un nombre y descripción válida para continuar');
+      }
+      this.loadingProcesses = true;
+      const updatedProcess = {
+        id: processId, name, description, is_active,
+      };
+
+      this.$store.dispatch('processModule/updateOne', updatedProcess)
+        .then(() => {
+          this.$notiflix.Notify.Success('Los cambios se guardaron con éxito');
+          this.getAllProcesses();
+        })
+        .catch(() => {
+          this.$notiflix.Notify.Failure('Algo salió mal, por favor reintenta');
+          this.loadingProcesses = false;
+        });
+
+      return true;
+    },
+    editProcess(process) {
+      this.$store.dispatch('processModule/undoEditAll');
+      this.processEditForm = { ...process };
+      process.is_editing = true;
+    },
+    cancelEditProcess(process) {
+      this.processEditForm = { name: '', description: '', is_active: false };
+      process.is_editing = false;
+    },
     getAllProcesses() {
       this.loadingProcesses = true;
       this.$store.dispatch('processModule/getAll')

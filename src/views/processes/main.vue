@@ -82,11 +82,21 @@
               </v-icon>
               Editar
             </v-btn>
-            <v-btn @click="confirmDeleteProcess(item)" depressed small :color="colors.error">
+            <v-btn
+              class="mr-2"
+              @click="confirmDeleteProcess(item)"
+              depressed small :color="colors.error"
+            >
               <v-icon small left>
                 mdi-close
               </v-icon>
               Eliminar
+            </v-btn>
+            <v-btn :to="`/process/${item.id}/steps`" depressed small :color="colors.primary">
+              <v-icon left>
+                mdi-debug-step-over
+              </v-icon>
+              Pasos
             </v-btn>
           </template>
           <template v-else>
@@ -261,7 +271,7 @@ export default {
           this.getAllProcesses();
           this.deletingProcess = false;
           this.dialog = false;
-          this.$notiflix.Notify.Success('EL proceso se ha eliminado correctamente');
+          this.$notiflix.Notify.Success('El proceso se ha eliminado correctamente');
         })
         .catch(() => {
           this.deletingProcess = false;

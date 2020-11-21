@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Register from '@/views/Register.vue';
 import Login from '@/views/Login.vue';
 import Processes from '@/views/processes/main.vue';
+import StepsOfProcess from '@/views/steps/main.vue';
 import Home from '@/views/Home.vue';
 
 Vue.use(VueRouter);
@@ -59,6 +60,12 @@ const routes = [
     path: '/processes',
     name: 'Processes',
     component: Processes,
+    beforeEnter: requiresAuth,
+  },
+  {
+    path: '/process/:processId/steps',
+    name: 'Steps',
+    component: StepsOfProcess,
     beforeEnter: requiresAuth,
   },
   {

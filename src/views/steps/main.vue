@@ -21,7 +21,7 @@
     <template v-for="(step, stepIndex) of steps">
       <v-card
         :key="stepIndex"
-        max-width="70rem"
+        max-width="120rem"
         class="mt-2 mx-auto"
         color="primary" dark flat
       >

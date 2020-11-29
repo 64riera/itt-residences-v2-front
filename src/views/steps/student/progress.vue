@@ -53,7 +53,7 @@
                       <template v-if="!step.blocked">
                           <v-file-input
                               v-model="currentStepForm.file"
-                              v-if="parseInt(step.includes_file)"
+                              v-if="step.includes_file"
                               label="Debe incluir el archivo solicitado"
                           >
                           </v-file-input>

@@ -56,7 +56,7 @@
           v-slot:item.is_active="{ item }"
         >
           <template v-if="!item.is_editing">
-            <v-btn v-if="parseInt(item.is_active)" :color="colors.success" text>
+            <v-btn v-if="item.is_active" :color="colors.success" text>
               <v-icon>
                 mdi-check
               </v-icon>

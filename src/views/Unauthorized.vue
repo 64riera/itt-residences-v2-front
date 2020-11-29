@@ -21,12 +21,3 @@ export default {
   },
 };
 </script>
-
-* Modulo para subir archivo OK
-* Funcion para obtener el archivo OK
-
-* Administrador de ver progreso de sus alumnos y editarlo (Eliminarlo)
-* Vista de no autorizado OK
-* Vista para convertir un usario en Administrador
-
-* Filtro por procesos activos / inactivos (Backend - frontend)

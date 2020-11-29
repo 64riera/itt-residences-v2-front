@@ -2,6 +2,34 @@ const stepModule = {
   namespaced: true,
   state: {},
   actions: {
+    getStudentSteps({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        let url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/process/${payload.processId}/student/steps`);
+        let body = {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            Authorization: localStorage.getItem('AUTH_TOKEN'),
+          },
+        };
+
+        let errorMessage = false;
+        fetch(url, body)
+          .then((res) => {
+            if (!res.ok) {
+              errorMessage = true;
+            }
+
+            return res.json();
+          })
+          .then((data) => {
+            if (!errorMessage) {
+              resolve(data.data);
+            } else {
+              reject(data);
+            }
+          });
+      });
+    },
     getOfProcess({ commit }, payload) {
       return new Promise((resolve, reject) => {
         const url = new URL(

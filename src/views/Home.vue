@@ -1,25 +1,52 @@
 <template>
   <div class="mt-2">
-    <v-btn to="/processes" depressed small :color="colors.success">
+    <v-btn v-if="userType === ADMIN_TYPE" to="/processes" depressed small :color="colors.success">
       <v-icon left small>
         mdi-debug-step-over
       </v-icon>
-      Procesos
+      Administrar Procesos
     </v-btn>
     <v-card class="mt-4" flat outlined>
       <v-card-title>
         <h4 class="font-weight-light">
-          Historial de residentes
+          Historial de procesos
         </h4>
-        <v-spacer></v-spacer>
-        <v-btn depressed small :color="colors.success">
-          Exportar datos
-          <v-icon right small>
-            mdi-download
-          </v-icon>
-        </v-btn>
       </v-card-title>
-      <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
+      <v-data-table
+        :loading="loadingProcesses"
+        :headers="headers"
+        :items="processes"
+        :search="search"
+      >
+        <template v-slot:item.name="{ item }">
+          <span>
+            {{ item.name }}
+          </span>
+        </template>
+
+        <template v-slot:item.description="{ item }">
+          <span>
+            {{ item.description }}
+          </span>
+        </template>
+
+        <template v-slot:item.actions="{ item }">
+          <template>
+            <v-btn
+              @click="seeProcessDetails(item)"
+              class="mr-2"
+              depressed
+              small
+              :color="colors.primary"
+            >
+              <v-icon small left>
+                mdi-arrow-right
+              </v-icon>
+              Ver detalles
+            </v-btn>
+          </template>
+        </template>
+      </v-data-table>
     </v-card>
   </div>
 </template>
@@ -28,99 +55,49 @@
 export default {
   data() {
     return {
+      ADMIN_TYPE: 1,
+      STUDENT_TYPE: 2,
+      loadingProcesses: false,
       search: '',
       headers: [
         {
-          text: 'Alumno',
+          text: 'Nombre',
           align: 'start',
           filterable: false,
           value: 'name',
         },
-        { text: 'Email', value: 'iron' },
-        { text: 'No. Control', value: 'calories' },
-        { text: 'Carrera', value: 'fat' },
-        { text: 'Semestre', value: 'carbs' },
-        { text: 'Progreso', value: 'protein' },
-      ],
-      desserts: [
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
-        {
-          name: 'Sergio Daniel Rivera',
-          iron: 'srivera@gmail.com',
-          calories: 18860155,
-          fat: 'Ingeniería Informática',
-          carbs: '60%',
-          protein: '5to',
-        },
+        { text: 'Descripción', value: 'description' },
+        { text: 'Acciones', value: 'actions' },
       ],
     };
   },
+  methods: {
+    seeProcessDetails(process) {
+      if (parseInt(this.userType, 10) === 1) {
+        this.$router.push(`/admin/process/${process.id}/steps`);
+      } else {
+        this.$router.push(`/student/process/${process.id}/steps`);
+      }
+    },
+    getAllProcesses() {
+      this.loadingProcesses = true;
+      this.$store.dispatch('processModule/getAll')
+        .then(() => { this.loadingProcesses = false; })
+        .catch(() => { this.loadingProcesses = false; });
+    },
+  },
+  mounted() {
+    this.getAllProcesses();
+  },
   computed: {
+    userType() {
+      return this.$store.state.userModule.user.user_type;
+    },
     colors() {
       return this.$store.state.colors;
+    },
+    processes() {
+      return this.$store.state.processModule.processes;
     },
   },
 };

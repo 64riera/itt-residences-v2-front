@@ -34,6 +34,11 @@ export default {
   mounted() {
     this.$store.dispatch('userModule/verifyAuth');
   },
+  updated() {
+    if (this.isLogged) {
+      this.$store.dispatch('userModule/getInfo');
+    }
+  },
   computed: {
     colors() {
       return this.$store.state.colors;

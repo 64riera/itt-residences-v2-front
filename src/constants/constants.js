@@ -3,6 +3,7 @@ const colors = {
   secondary: 'info',
   error: 'error',
   success: 'success',
+  white: '#fff',
 };
 
 export default colors;

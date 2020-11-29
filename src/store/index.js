@@ -7,6 +7,7 @@ import * as areaModule from '@/store/area/module';
 import * as typeUserModule from '@/store/typeUser/module';
 import * as processModule from '@/store/process/module';
 import * as stepModule from '@/store/step/module';
+import * as dropboxModule from '@/store/dropbox/module';
 
 Vue.use(Vuex);
 
@@ -23,5 +24,6 @@ export default new Vuex.Store({
     typeUserModule,
     processModule,
     stepModule,
+    dropboxModule,
   },
 });

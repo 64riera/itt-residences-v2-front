@@ -6,6 +6,7 @@ import Processes from '@/views/processes/main.vue';
 import StepsOfProcess from '@/views/steps/main.vue';
 import StudentSteps from '@/views/steps/student/progress.vue';
 import AdminSteps from '@/views/steps/admin/progress.vue';
+import Unauthorized from '@/views/Unauthorized.vue';
 import Home from '@/views/Home.vue';
 
 Vue.use(VueRouter);
@@ -128,12 +129,9 @@ const routes = [
     beforeEnter: requiresAuthAdmin,
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    path: '/unauthorized',
+    name: 'Unauthorized',
+    component: Unauthorized,
   },
 ];
 

@@ -189,7 +189,7 @@ export default {
           })
           .catch(() => {
             this.savingStep = false;
-            this.$notiflix.Notify.Success('Hubo problemas para registrar tu avance :(')
+            this.$notiflix.Notify.Success('Hubo problemas para registrar tu avance :(');
           });
       }
       return true;

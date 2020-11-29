@@ -4,9 +4,14 @@ import Register from '@/views/Register.vue';
 import Login from '@/views/Login.vue';
 import Processes from '@/views/processes/main.vue';
 import StepsOfProcess from '@/views/steps/main.vue';
+import StudentSteps from '@/views/steps/student/progress.vue';
+import AdminSteps from '@/views/steps/admin/progress.vue';
 import Home from '@/views/Home.vue';
 
 Vue.use(VueRouter);
+
+const ADMIN_TYPE = 1;
+const STUDENT_TYPE = 2;
 
 function isAuthenticated() {
   const auth = localStorage.getItem('AUTH_TOKEN');
@@ -15,6 +20,48 @@ function isAuthenticated() {
   }
 
   return false;
+}
+
+function isAdmin() {
+  const userType = parseInt(localStorage.getItem('USER_TYPE'), 10);
+  if (userType === ADMIN_TYPE) {
+    return true;
+  }
+
+  return false;
+}
+
+function isStudent() {
+  const userType = parseInt(localStorage.getItem('USER_TYPE'), 10);
+  if (userType === STUDENT_TYPE) {
+    return true;
+  }
+
+  return false;
+}
+
+function requiresAuthAdmin(to, from, next) {
+  if (isAuthenticated()) {
+    if (isAdmin()) {
+      next();
+    } else {
+      next('/unauthorized');
+    }
+  } else {
+    next('/login');
+  }
+}
+
+function requiresAuthStudent(to, from, next) {
+  if (isAuthenticated()) {
+    if (isStudent()) {
+      next();
+    } else {
+      next('/unauthorized');
+    }
+  } else {
+    next('/login');
+  }
 }
 
 function requiresAuth(to, from, next) {
@@ -67,6 +114,18 @@ const routes = [
     name: 'Steps',
     component: StepsOfProcess,
     beforeEnter: requiresAuth,
+  },
+  {
+    path: '/student/process/:processId/steps',
+    name: 'Student Steps',
+    component: StudentSteps,
+    beforeEnter: requiresAuthStudent,
+  },
+  {
+    path: '/admin/process/:processId/steps',
+    name: 'Admin Steps',
+    component: AdminSteps,
+    beforeEnter: requiresAuthAdmin,
   },
   {
     path: '/about',

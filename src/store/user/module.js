@@ -5,6 +5,37 @@ const userModule = {
     isLogged: false,
   },
   actions: {
+    getInfo({ commit }) {
+      return new Promise((resolve, reject) => {
+        let url = new URL(`${process.env.VUE_APP_BACKEND_HOST}/api/auth/user`);
+        let body = {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            Authorization: localStorage.getItem('AUTH_TOKEN'),
+          },
+        };
+
+        let errorMessage = false;
+        fetch(url, body)
+          .then((res) => {
+            if (!res.ok) {
+              errorMessage = true;
+            }
+
+            return res.json();
+          })
+          .then((data) => {
+            if (!errorMessage) {
+              localStorage.setItem('USER_TYPE', data.data.user_type);
+              commit('setInfo', data.data);
+              resolve(data.data);
+            } else {
+              reject(data);
+            }
+          });
+      });
+    },
     verifyAuth({ commit }) {
       const auth = localStorage.getItem('AUTH_TOKEN');
       if (auth) {
@@ -87,12 +118,16 @@ const userModule = {
     },
   },
   mutations: {
+    setInfo(state, payload) {
+      state.user = payload;
+    },
     setIsLogged(state, payload) {
       state.isLogged = payload;
     },
     unsetUserData(state) {
       state.isLogged = false;
       localStorage.removeItem('AUTH_TOKEN');
+      localStorage.removeItem('USER_TYPE');
     },
   },
 };

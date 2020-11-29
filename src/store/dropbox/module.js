@@ -1,7 +1,7 @@
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
 const Dropbox = require('dropbox');
 
-const DEFAULT_PATH = '/dev-residences-v2/';
+const DEFAULT_PATH = process.env.VUE_APP_DROPBOX_DEFAULT_PATH;
 
 const dbx = new Dropbox.Dropbox({ accessToken: process.env.VUE_APP_DROPBOX_ACCESS_TOKEN });
 

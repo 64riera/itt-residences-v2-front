@@ -84,7 +84,7 @@
                             small
                             text
                           >
-                            Descargar archivo subido
+                            Descargar archivo registrado
                             <v-icon right small>
                               mdi-download
                             </v-icon>

@@ -6,6 +6,7 @@ import Processes from '@/views/processes/main.vue';
 import StepsOfProcess from '@/views/steps/main.vue';
 import StudentSteps from '@/views/steps/student/progress.vue';
 import AdminSteps from '@/views/steps/admin/progress.vue';
+import StudentStepsForAdmin from '@/views/steps/admin/details.vue';
 import Unauthorized from '@/views/Unauthorized.vue';
 import Home from '@/views/Home.vue';
 
@@ -126,6 +127,12 @@ const routes = [
     path: '/admin/process/:processId/steps',
     name: 'Admin Steps',
     component: AdminSteps,
+    beforeEnter: requiresAuthAdmin,
+  },
+  {
+    path: '/admin/process/:processId/student/:studentId/steps',
+    name: 'Student Steps For Admin',
+    component: StudentStepsForAdmin,
     beforeEnter: requiresAuthAdmin,
   },
   {
